@@ -3,7 +3,6 @@ const express = require('express');
 
 // Import the app
 const app = express();
-const PORT = 3000;
 
 app.get('/', (req, res) => {
   res.send('Hello from Node.js App! CI/CD Pipeline is working! 🚀');
