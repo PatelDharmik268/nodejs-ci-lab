@@ -1,48 +1,35 @@
 name: Node.js CI
-
 on:
-  push:
-    branches: [ "main" ]
-
+ push:
+ branches: [ "main" ]
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    # Add these permissions
-    permissions:
-      contents: read
-      packages: write
+ build-and-test:
+ runs-on: ubuntu-latest
+ permissions:
+ contents: read
+ packages: write
+ steps:
+ - name: Checkout Repository
+ uses: actions/checkout@v4
+ - name: Set up Node.js
+ uses: actions/setup-node@v4
+ with:
+ node-version: '18'
+ cache: 'npm'
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Tests
-        run: npm test
-
-      - name: Test with ESLint
-        run: npm run lint
-
-      # New step: Log in to GitHub Container Registry
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # New step: Build and Push Docker Image
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/nodejs-ci-lab:${{ github.sha }}
+ - name: Install Dependencies
+ run: npm ci
+ - name: Test with ESLint
+ run: npm run lint
+ - name: Log in to GitHub Container Registry
+ uses: docker/login-action@v3
+ with:
+ registry: ghcr.io
+ username: ${{ github.actor }}
+ password: ${{ secrets.GITHUB_TOKEN }}
+ - name: Build and Push Docker Image
+ uses: docker/build-push-action@v5
+ with:
+ context: .
+ push: true
+ tags: ghcr.io/${{ github.repository_owner }}/nodejs-cilab:${{ github.sha }}
